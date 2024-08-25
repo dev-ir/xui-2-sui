@@ -26,14 +26,13 @@ install_jq() {
 
 require_command(){
     
-    apt update -y && apt upgrade -y
-    install_jq
     if ! command -v pv &> /dev/null
     then
         echo "pv could not be found, installing it..."
         sudo apt update
         sudo apt install -y pv
     fi
+    install_jq
 }
 
 
@@ -50,25 +49,25 @@ menu(){
     
     SUI_CORE=$(check_sui_exist)
     
-    echo "+---------------------------------------------------------------------------+"                                                                                                
-    echo "| __   __ _    _  _____     ___       _____  _    _  _____                  |"
-    echo "| \ \ / /| |  | ||_   _|   |__ \     / ____|| |  | ||_   _|                 |"
-    echo "|  \ V / | |  | |  | |        ) |   | (___  | |  | |  | |    TG CHANNEL     |"
-    echo "|   > <  | |  | |  | |       / /     \___ \ | |  | |  | |    @DVHOST_CLOUD  |"
-    echo "|  / . \ | |__| | _| |_     / /_     ____) || |__| | _| |_     ( 0.0.1 )    |"
-    echo "| /_/ \_\ \____/ |_____|   |____|   |_____/  \____/ |_____|                 |"
-    echo "+---------------------------------------------------------------------------+"                                                                                                
-    echo -e "|Telegram Channel : ${GREEN}@DVHOST_CLOUD ${NC}|YouTube : ${RED}youtube.com/@dvhost_cloud${NC}  "
-    echo "+---------------------------------------------------------------------------+"                                                                                                
+    echo "+---------------------------------------------------------------------+"                                                                                                
+    echo "| __   __ _    _  _____     ___       _____  _    _  _____            |"
+    echo "| \ \ / /| |  | ||_   _|   |__ \     / ____|| |  | ||_   _|           |"
+    echo "|  \ V / | |  | |  | |        ) |   | (___  | |  | |  | |             |"
+    echo "|   > <  | |  | |  | |       / /     \___ \ | |  | |  | |             |"
+    echo "|  / . \ | |__| | _| |_     / /_     ____) || |__| | _| |_  ( 0.0.1 ) |"
+    echo "| /_/ \_\ \____/ |_____|   |____|   |_____/  \____/ |_____|           |"
+    echo "+---------------------------------------------------------------------+"                                                                                                
+    echo -e "|Telegram Channel : ${GREEN}@DVHOST_CLOUD ${NC}|YouTube : ${RED}youtube.com/@dvhost_cloud${NC}|"
+    echo "+---------------------------------------------------------------------+"                                                                                                
     echo -e "|${GREEN}Server Country    |${NC} $SERVER_COUNTRY"
     echo -e "|${GREEN}Server IP         |${NC} $SERVER_IP"
     echo -e "|${GREEN}Server ISP        |${NC} $SERVER_ISP"
     echo -e "|${GREEN}Server SUI        |${NC} $SUI_CORE"
-    echo "+---------------------------------------------------------------------------+"                                                                                                
+    echo "+---------------------------------------------------------------------+"                                                                                                
     echo -e "|${YELLOW}Please choose an option:${NC}"
-    echo "+---------------------------------------------------------------------------+"                                                                                                
+    echo "+---------------------------------------------------------------------+"                                                                                                
     echo -e $1
-    echo "+---------------------------------------------------------------------------+"                                                                                                
+    echo "+---------------------------------------------------------------------+"                                                                                                
     echo -e "\033[0m"
 }
 
@@ -79,13 +78,10 @@ loader(){
     read -p "|Enter option number: " choice
     case $choice in
         1)
-            transfer_db
+            initialize
         ;;
         2)
-            gift_user
-        ;;
-        3)
-            manage_user
+            
         ;;
         0)
             echo -e "${GREEN}Exiting program...${NC}"
@@ -109,6 +105,48 @@ check_sui_exist() {
     fi
     
     echo "$status"
+}
+
+DVHOST_Transfer_Database(){
+    
+    read -p "Destination SERVER IP   ( Like : 127.0.0.1 ): " dest_ip
+    read -p "Destination SERVER USER ( Like : root) [default: root]: " dest_user
+    read -p "Destination SERVER PORT ( Like : 22 ) [default: 22]: " dest_port
+    
+    dest_user=${dest_user:-root}
+    dest_port=${dest_port:-22}
+    
+    db_file="/etc/x-ui/x-ui.db"
+    
+    echo "Transferring file..."
+    scp -P "$dest_port" "$db_file" "$dest_user@$dest_ip:/root/XUI2SUI"
+    
+    if [ $? -eq 0 ]; then
+        echo $'\e[32m Transfer completed successfully , Return to Menu in 3 seconds... \e[0m' && sleep 1 && echo $'\e[32m2... \e[0m' && sleep 1 && echo $'\e[32m1... \e[0m' && sleep 1 && {
+            get_database
+        }
+    else
+        echo "Transfer failed."
+    fi
+}
+
+DVHOST_Get_Database(){
+    
+    # Download File from Github
+    wget https://raw.githubusercontent.com/dev-ir/xui-2-sui/master/core/init.py
+    
+    # Run script
+    python3 init.py
+
+}
+
+
+initialize(){
+    
+    # Make direcotry XUI DB
+    mkdir /root/XUI2SUI/
+    DVHOST_Transfer_Database
+    DVHOST_Get_Database
 }
 
 require_command
