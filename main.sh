@@ -143,8 +143,13 @@ DVHOST_Get_Database(){
 
 initialize(){
     
+    # Remvoe Old version
+    rm -rf /root/XUI2SUI/
+
     # Make direcotry XUI DB
     mkdir /root/XUI2SUI/
+
+    # Transfer Database
     DVHOST_Transfer_Database
     DVHOST_Get_Database
 }
