@@ -1,33 +1,19 @@
-# Name  : XUI 2 SUI
-# Author: DVHOST_CLOUD
-# Date  : 8/25/2024
-# Test  : This script converts an XUI database to an SUI database format seamlessly. It is designed to handle all necessary transformations and ensure data integrity during the conversion process.
 import sqlite3
 
-DB_PATH = "/usr/local/s-ui/db/s-ui.db"
+SUI_PATH = "/usr/local/s-ui/db/s-ui.db"
+XUI_PATH = '/etc/x-ui/x-ui.db'
 
-def dvhost_connect_to_db():
-    return sqlite3.connect(DB_PATH)
+def dvhost_connect_to_xui_db():
+    return sqlite3.connect(XUI_PATH)
 
-def dvhost_inbound():
-    conn = dvhost_connect_to_db()
-    cursor = conn.cursor()
+def dvhost_connect_to_sui_db():
+    return sqlite3.connect(SUI_PATH)
 
-    # Check if port 443 already exists in the settings
-    cursor.execute('''
-    SELECT COUNT(*) FROM inbounds WHERE json_extract(settings, '$.port') = 443
-    ''')
-    count = cursor.fetchone()[0]
+def dvhost_transfer_user():
+    xui = dvhost_connect_to_xui_db()
+    sui = dvhost_connect_to_sui_db()
+    cursor.execute("SELECT * FROM users where username = ")
 
-    if count == 0:
-        # Insert new data if port 443 does not exist
-        cursor.execute('''
-        INSERT INTO inbounds (id, user_id, up, down, total, remark, enable, expiry_time, listen, port, protocol, settings)
-        VALUES (8, 1, 0, 0, 0, 'Server 19', 1, 0, 0, 50981, 'dokodemo-door', '{"address": "149.154.167.220", "port": 443, "network": "tcp", "followRedirect": false, "timeout": 0}')
-        ''')
-        print("Telegram bot is activated.")
-    else:
-        print("Port 443 already exists in the settings. Data not inserted.")
 
 def dvhost_main():
     try:
